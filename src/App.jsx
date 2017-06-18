@@ -2,24 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {
   HashRouter as Router,
-  Link,
-  Route,
 } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import transitions from 'material-ui/styles/transitions';
-import PlaylistIcon from 'material-ui/svg-icons/av/playlist-play';
-import RadioIcon from 'material-ui/svg-icons/av/radio';
-import SettingsIcon from 'material-ui/svg-icons/action/settings';
-import InfoIcon from 'material-ui/svg-icons/action/info';
 import { ipcRenderer } from 'electron';
 
-import Program from './routes/Program';
-import Stations from './routes/Stations';
-import Settings from './routes/Settings';
-import About from './routes/About';
 import MenuHeader from './components/MenuHeader';
 import MediaBar from './components/MediaBar';
 
@@ -47,34 +37,6 @@ const styles = {
     textDecoration: 'none',
   },
 };
-
-const routes = [
-  {
-    link: '/',
-    exact: true,
-    title: 'Programm',
-    component: Program,
-    icon: <PlaylistIcon/>,
-  },
-  {
-    link: '/stations',
-    title: 'Sender',
-    component: Stations,
-    icon: <RadioIcon/>,
-  },
-  {
-    link: '/settings',
-    title: 'Einstellungen',
-    component: Settings,
-    icon: <SettingsIcon/>,
-  },
-  {
-    link: '/about',
-    title: 'Info',
-    component: About,
-    icon: <InfoIcon/>,
-  },
-];
 
 @connect(store => ({
   station: store.station,
@@ -160,7 +122,8 @@ export default class App extends React.Component {
                     onLeftIconButtonTouchTap={() => this.toggleDrawer()}
                     height={headerHeight}
                     iconStyleLeft={{ display: this.state.drawer.docked ? 'none' : 'block' }}
-                    style={{ paddingLeft }}/>
+                    style={{ paddingLeft }}
+                    docked={this.state.drawer.docked}/>
           <Drawer open={this.state.drawer.open}
                   docked={this.state.drawer.docked}
                   onRequestChange={() => this.toggleDrawer()}>

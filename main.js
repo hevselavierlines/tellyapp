@@ -6,14 +6,14 @@ const { app, BrowserWindow, globalShortcut, ipcMain, clipboard } = require('elec
 const path = require('path');
 const url = require('url');
 
-const showDevTools = true;
+const showDevTools = false;
 
 let win;
 
 function createWindow() {
   if (win == null) {
     win = new BrowserWindow({
-      width: showDevTools ? 1000 : 400,
+      width: showDevTools ? 1000 : 640,
       height: 600,
       icon: path.join(__dirname, 'src', 'logos', 'orf1-128-round.png'),
       webPreferences: {

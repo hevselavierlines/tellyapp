@@ -10,7 +10,7 @@ import ErrorIcon from 'material-ui/svg-icons/alert/warning';
 import FullScreen from 'material-ui/svg-icons/navigation/fullscreen';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import Slider from 'material-ui/Slider';
-import { ipcRenderer, shell } from 'electron';
+import { shell } from 'electron';
 
 const styles = {
   element: {
@@ -61,6 +61,7 @@ const styles = {
   },
   videoDiv: {
     paddingTop: 40,
+    marginLeft: -40,
   },
 };
 
@@ -84,42 +85,17 @@ export default class MediaBar extends React.Component {
     iconStyleLeft: PropTypes.object,
     style: PropTypes.object,
     height: PropTypes.number,
+    docked: PropTypes.bool.isRequired,
   };
 
   componentDidMount() {
-    /*
-    ipcRenderer.on('VolumeUp', () => {
-      this.updateVolume(Math.min(this.state.volume + 0.1, 1.0));
-    });
-    ipcRenderer.on('VolumeDown', () => {
-      this.updateVolume(Math.max(this.state.volume - 0.1, 0.0));
-    });
-    ipcRenderer.on('VolumeMute', () => {
-      this.updateVolume(this.state.volume === 0 ? 1 : 0);
-    });
-    ipcRenderer.on('MediaPlayPause', () => {
-      this.playPause();
-    });
-    ipcRenderer.on('MediaStop', () => {
-      if (this.state.playing) {
-        this.playPause();
-      }
-    });
-    this.audioElement.addEventListener('playing', () => {
-      this.setState({ playing: true, error: false });
-    });
-    this.audioElement.addEventListener('error', () => {
-      this.setState({ error: true });
-    });*/
-
+    const vm = this;
     this.player = videojs(this.videoNode);
-    var vm = this;
-    this.player.on('fullscreenchange', function() {
-      vm.fullScreenChange();
+    this.player.on('fullscreenchange', function () {
+      vm.toggleFullscreen();
     });
-    //myPlayer.src({ type: "application/x-mpegURL", src: "http://live-lh.daserste.de/i/daserste_de@91204/master.m3u8" });
     this.player.play();
-    this.state.playing = true;
+    this.setState({ playing: true });
     this.currentStation = this.props.station.streamurl;
   }
 
@@ -129,14 +105,14 @@ export default class MediaBar extends React.Component {
   }
 
   componentDidUpdate() {
-    if(this.currentStation != this.props.station.streamurl) {
+    if (this.currentStation !== this.props.station.streamurl) {
       this.currentStation = this.props.station.streamurl;
       this.player.src({
         src: this.props.station.streamurl,
         type: 'application/x-mpegURL',
       });
       this.player.play();
-      this.state.playing = true;
+      this.setState({ playing: true });
     }
   }
 
@@ -156,8 +132,8 @@ export default class MediaBar extends React.Component {
     return this.state.playing ? <PauseIcon/> : <PlayIcon/>;
   }
 
-  fullScreenChange() {
-    if(this.player.isFullscreen()) {
+  toggleFullscreen() {
+    if (this.player.isFullscreen()) {
       this.setState({ fullscreen: true });
     } else {
       this.setState({ fullscreen: false });
@@ -169,17 +145,13 @@ export default class MediaBar extends React.Component {
     this.player.requestFullscreen();
   }
 
-  getFullScreenIcon() {
-    return <FullScreen/>;
-  }
-
   openWebsite() {
     shell.openExternal(this.props.station.website);
   }
 
   render() {
-    const marginLeft = (this.state.fullscreen ? -64 : 128);
-    const width = (this.state.fullscreen ? '100%' : '90%');
+    const marginLeft = (this.state.fullscreen || !this.props.docked ? 0 : 120);
+    const width = '100%';
     return <div style={{
       height: this.props.height,
       ...styles.element,
@@ -208,13 +180,13 @@ export default class MediaBar extends React.Component {
             </FloatingActionButton>
             <FloatingActionButton
               onTouchTap={() => this.fullScreen()}>
-              {this.getFullScreenIcon()}
+              <FullScreen/>
             </FloatingActionButton>
           </div>
         </div>
       </div>
       <div style={ styles.videoDiv }>
-        <video ref={ node => this.videoNode = node } style={{ marginLeft, width }} className="video-js" class="video-js" width="640" height="480">
+        <video ref={ node => (this.videoNode = node) } style={{ marginLeft, width }} className="video-js" width="640" height="480">
           <source
             src={this.props.station.streamurl}
             type={this.props.station.format}/>

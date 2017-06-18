@@ -1,7 +1,7 @@
 {
-  "name": "ractio",
+  "name": "tellyapp",
   "version": "1.0.0",
-  "description": "A sample radio player built with React.js - the clean commits provide a step by step setup guide",
+  "description": "A sample television player built with React.js, video.js and electron",
   "main": "main.js",
   "scripts": {
     "test": "jest",
@@ -18,12 +18,12 @@
     "react",
     "material"
   ],
-  "author": "Paul Em",
+  "author": "Afaci Miratgo",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/paul-em/ractio/issues"
+    "url": "https://github.com/hevselavierlines/tellyapp/issues"
   },
-  "homepage": "https://github.com/paul-em/ractio#readme",
+  "homepage": "https://github.com/hevselavierlines/tellyapp#readme",
   "dependencies": {
     "electron": "^1.6.8",
     "material-ui": "^0.17.4",
