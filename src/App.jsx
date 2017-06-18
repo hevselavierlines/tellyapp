@@ -25,6 +25,7 @@ import MediaBar from './components/MediaBar';
 
 import stationList from './stations';
 import { setStation as setStationAction } from './actions';
+import logos from './logos';
 
 const headerHeight = 160;
 const styles = {
@@ -166,13 +167,11 @@ export default class App extends React.Component {
             <MenuHeader station={this.props.station.shortName}/>
             {stationList.map(route => (
                 <MenuItem primaryText={route.name}
+                          icon={logos[route]}
+                          key={route.shortName}
                           onTouchTap={() => this.setStation(route)}/>
-
             ))}
           </Drawer>
-          <div style={{ ...styles.content, paddingLeft }}>
-            <video src={this.state.stream} style={{ maxHeight: 100 }} autoPlay="autoPlay"/>
-          </div>
         </div>
       </Router>
     </MuiThemeProvider>;

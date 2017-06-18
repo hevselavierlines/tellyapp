@@ -7,6 +7,7 @@ import transitions from 'material-ui/styles/transitions';
 import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
 import PauseIcon from 'material-ui/svg-icons/av/pause';
 import ErrorIcon from 'material-ui/svg-icons/alert/warning';
+import FullScreen from 'material-ui/svg-icons/navigation/fullscreen';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import Slider from 'material-ui/Slider';
 import { ipcRenderer, shell } from 'electron';
@@ -42,7 +43,7 @@ const styles = {
     width: '100%',
     height: 10,
     right: 0,
-    bottom: 0,
+    bottom: 62,
   },
   fab: {
     position: 'absolute',
@@ -52,11 +53,14 @@ const styles = {
   slider: {
     position: 'absolute',
     width: 100,
-    right: 110,
+    right: 180,
     bottom: 0,
   },
   innerSlider: {
     margin: 0,
+  },
+  videoDiv: {
+    paddingTop: 40,
   },
 };
 
@@ -68,6 +72,7 @@ export default class MediaBar extends React.Component {
       error: false,
       volume: 1,
       audio: new Audio(),
+      fullscreen: false,
     };
   }
 
@@ -108,14 +113,19 @@ export default class MediaBar extends React.Component {
     });*/
 
     this.player = videojs(this.videoNode);
+    var vm = this;
+    this.player.on('fullscreenchange', function() {
+      vm.fullScreenChange();
+    });
     //myPlayer.src({ type: "application/x-mpegURL", src: "http://live-lh.daserste.de/i/daserste_de@91204/master.m3u8" });
     this.player.play();
+    this.state.playing = true;
     this.currentStation = this.props.station.streamurl;
   }
 
   updateVolume(volume) {
     this.setState({ volume });
-    this.audioElement.volume = volume;
+    this.player.volume(volume);
   }
 
   componentDidUpdate() {
@@ -126,22 +136,17 @@ export default class MediaBar extends React.Component {
         type: 'application/x-mpegURL',
       });
       this.player.play();
+      this.state.playing = true;
     }
   }
 
   playPause() {
-    /*if (this.state.playing) {
-      this.audioElement.pause();
+    if (this.state.playing) {
+      this.player.pause();
     } else {
-      this.audioElement.play();
+      this.player.play();
     }
     this.setState({ playing: !this.state.playing });
-*/
-    this.player.src({
-      src: this.props.station.streamurl,
-      type: 'application/x-mpegURL',
-    });
-    this.player.play();
   }
 
   getPlayIcon() {
@@ -150,11 +155,31 @@ export default class MediaBar extends React.Component {
     }
     return this.state.playing ? <PauseIcon/> : <PlayIcon/>;
   }
-  openWebtite() {
+
+  fullScreenChange() {
+    if(this.player.isFullscreen()) {
+      this.setState({ fullscreen: true });
+    } else {
+      this.setState({ fullscreen: false });
+    }
+  }
+
+  fullScreen() {
+    this.setState({ fullscreen: true });
+    this.player.requestFullscreen();
+  }
+
+  getFullScreenIcon() {
+    return <FullScreen/>;
+  }
+
+  openWebsite() {
     shell.openExternal(this.props.station.website);
   }
 
   render() {
+    const marginLeft = (this.state.fullscreen ? -64 : 128);
+    const width = (this.state.fullscreen ? '100%' : '90%');
     return <div style={{
       height: this.props.height,
       ...styles.element,
@@ -166,7 +191,7 @@ export default class MediaBar extends React.Component {
               iconStyleLeft={this.props.iconStyleLeft}
               iconElementRight={<IconButton tooltip="Open Station Website"
                                             tooltipPosition="bottom-left"
-                                            onTouchTap={ () => this.openWebtite() }>
+                                            onTouchTap={ () => this.openWebsite() }>
                 <LinkIcon /></IconButton>}/>
       <div style={{ ...styles.headlines, ...this.props.style }}>
         <h1 style={{ ...styles.headline, ...styles.h1 }}>{this.props.station.name}</h1>
@@ -181,14 +206,20 @@ export default class MediaBar extends React.Component {
               onTouchTap={() => this.playPause()}>
               {this.getPlayIcon()}
             </FloatingActionButton>
+            <FloatingActionButton
+              onTouchTap={() => this.fullScreen()}>
+              {this.getFullScreenIcon()}
+            </FloatingActionButton>
           </div>
         </div>
       </div>
-      <video ref={ node => this.videoNode = node } className="video-js" class="video-js" width="320" height="240" controls>
-        <source
-          src={this.props.station.streamurl}
-          type={this.props.station.format}/>
-      </video>
+      <div style={ styles.videoDiv }>
+        <video ref={ node => this.videoNode = node } style={{ marginLeft, width }} className="video-js" class="video-js" width="640" height="480">
+          <source
+            src={this.props.station.streamurl}
+            type={this.props.station.format}/>
+        </video>
+      </div>
     </div>;
   }
 }

@@ -45,21 +45,6 @@ function createWindow() {
 app.on('ready', () => {
   console.log('ready!');
   createWindow();
-  globalShortcut.register('VolumeUp', () => {
-    win.webContents.send('VolumeUp');
-  });
-  globalShortcut.register('VolumeDown', () => {
-    win.webContents.send('VolumeDown');
-  });
-  globalShortcut.register('VolumeMute', () => {
-    win.webContents.send('VolumeMute');
-  });
-  globalShortcut.register('MediaPlayPause', () => {
-    win.webContents.send('MediaPlayPause');
-  });
-  globalShortcut.register('MediaStop', () => {
-    win.webContents.send('MediaStop');
-  });
 
   ipcMain.on('stationChange', (event, arg) => {
     if (process.platform === 'darwin') {
